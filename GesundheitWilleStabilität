@@ -1,4 +1,4 @@
-// Skript zum Verwalten von Gesundheit, Wille und Stabilität
+// Skript zum Verwalten von Gesundheit
 
 
 main();
@@ -14,7 +14,7 @@ async function main() {
         return;
     };
     
-	//gewählter Charakter
+	//gewählter Held
     if(game.user.targets.size === 1){
         targetActor = game.user.targets.values().next().value.actor;
         targetName = targetActor.name;
@@ -25,13 +25,14 @@ async function main() {
 
 //###############################################################################################################################################################################################################################################
 
-	//Name des gewählten Charakters
+	//Name des gewählten Charakter
 		const tokenName = token.actor.name;
 
-	//Werte
+	//Gesundheit-Rationen
 		const Gesundheit = token.actor.system.health.value;
 		const Wille = token.actor.system.wp.value;
 		const Stabilität = token.actor.system.sanity.value;
+		const Schwelle = token.actor.system.sanity.currentBreakingPoint;
 
 //###############################################################################################################################################################################################################################################
 
@@ -46,7 +47,7 @@ async function main() {
 	
 //###############################################################################################################################################################################################################################################    
 
-	headerDialog = "<h2>Die Werte von <i>" + tokenName + "</i></h2>";
+	headerDialog = "<h2>Gesundheit von <i>" + tokenName + "</i></h2>";
 	inputDialog = headerDialog;
 	inputDialog += divFlexStart + "Gesundheit:<input id='inputGesundheit'" + divInputNumber  + "0'/>" + divFlexEnd;
 	inputDialog += divFlexStart + "Wille:<input id='inputWille'" + divInputNumber  + "0'/>" + divFlexEnd;
@@ -69,9 +70,14 @@ async function main() {
 	}
 	inputDialog += "<u>Stabilität:</u><br>"
 	if(Wille === 1){
-		inputDialog += "<b>" + Stabilität + "</b> Punkt<br><br>";
+		inputDialog += "<b>" + Stabilität + "</b> Punkt<br>";
 	}else{
-		inputDialog += "<b>" + Stabilität + "</b> Punkte<br><br>";
+		inputDialog += "<b>" + Stabilität + "</b> Punkte<br>";
+	}
+	if(Schwelle === 1){
+		inputDialog += "Schwelle: <b>" + Schwelle + "</b> Punkt<br><br>";
+	}else{
+		inputDialog += "Schwelle: <b>" + Schwelle + "</b> Punkte<br><br>";
 	}
 
 //###############################################################################################################################################################################################################################################    
