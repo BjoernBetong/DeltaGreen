@@ -1,4 +1,4 @@
-// Skript zum Verwalten von Gesundheit
+// Skript zum Verwalten von Gesundheit, Wille und Stabilität
 
 
 main();
@@ -14,7 +14,7 @@ async function main() {
         return;
     };
     
-	//gewählter Held
+	//gewählter Charakter
     if(game.user.targets.size === 1){
         targetActor = game.user.targets.values().next().value.actor;
         targetName = targetActor.name;
@@ -25,10 +25,10 @@ async function main() {
 
 //###############################################################################################################################################################################################################################################
 
-	//Name des gewählten Charakter
+	//Name des gewählten Charakters
 		const tokenName = token.actor.name;
 
-	//Gesundheit-Rationen
+	//Werte
 		const Gesundheit = token.actor.system.health.value;
 		const Wille = token.actor.system.wp.value;
 		const Stabilität = token.actor.system.sanity.value;
@@ -46,7 +46,7 @@ async function main() {
 	
 //###############################################################################################################################################################################################################################################    
 
-	headerDialog = "<h2>Gesundheit von <i>" + tokenName + "</i></h2>";
+	headerDialog = "<h2>Die Werte von <i>" + tokenName + "</i></h2>";
 	inputDialog = headerDialog;
 	inputDialog += divFlexStart + "Gesundheit:<input id='inputGesundheit'" + divInputNumber  + "0'/>" + divFlexEnd;
 	inputDialog += divFlexStart + "Wille:<input id='inputWille'" + divInputNumber  + "0'/>" + divFlexEnd;
