@@ -148,19 +148,19 @@ async function main() {
 		flavor += hr;
 		flavor += "Die aktuellen Werte sind:<br>";
 		if(newGesundheit === 1){
-			flavor += "<b>" + newGesundheit + "</b> Punkt<br>";
+			flavor += "Gesundheit: <b>" + newGesundheit + "</b> Punkt<br>";
 		}else{
-			flavor += "<b>" + newGesundheit + "</b> Punkte<br>";
+			flavor += "Gesundheit: <b>" + newGesundheit + "</b> Punkte<br>";
 		}
 		if(newWille === 1){
-			flavor += "<b>" + newWille + "</b> Punkt<br>";
+			flavor += "Wille: <b>" + newWille + "</b> Punkt<br>";
 		}else{
-			flavor += "<b>" + newWille + "</b> Punkte<br>";
+			flavor += "Wille: <b>" + newWille + "</b> Punkte<br>";
 		}
 		if(newStabilität === 1){
-			flavor += "<b>" + newStabilität + "</b> Punkt<br>";
+			flavor += "Stabilität: <b>" + newStabilität + "</b> Punkt, Schwelle: <b>" + Schwelle + "</b> Punkte<br>";
 		}else{
-			flavor += "<b>" + newStabilität + "</b> Punkte<br>";
+			flavor += "Stabilität: <b>" + newStabilität + "</b> Punkte, Schwelle: <b>" + Schwelle + "</b> Punkte<br>";
 		}
 		
 		ChatMessage.create({
