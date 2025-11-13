@@ -1,0 +1,181 @@
+// Skript zum Verwalten von Gesundheit
+
+
+main();
+async function main() {
+
+    //Überprüfe, ob ein Charakter ausgewählt wurde
+    if (canvas.tokens.controlled.length === 0 || canvas.tokens.controlled.length > 1) {
+        ui.notifications.error("Bitte einen Charakter auswählen.");
+        return;
+    };
+    if (game.user.targets.size > 1) {
+        ui.notifications.error("Bitte nur einen Charakter anvisieren.");
+        return;
+    };
+    
+	//gewählter Held
+    if(game.user.targets.size === 1){
+        targetActor = game.user.targets.values().next().value.actor;
+        targetName = targetActor.name;
+    }else{
+        targetActor = "";
+        targetName = "";
+	};
+
+//###############################################################################################################################################################################################################################################
+
+	//Name des gewählten Charakter
+		const tokenName = token.actor.name;
+
+	//Gesundheit-Rationen
+		const Gesundheit = token.actor.system.health.value;
+		const Wille = token.actor.system.wp.value;
+		const Stabilität = token.actor.system.sanity.value;
+
+//###############################################################################################################################################################################################################################################
+
+    //allgemeine Dialogoptionen
+		const hr = "<hr>";
+		const divFlexStart = "<div style='display:flex'><span style='flex:1'>";
+		const divFlexEnd = "</span></div>";
+		const divInputNumber = "type='number' style='width:50px;float:right' value='";
+		const divInputBox = "type='checkbox' style='width:70px;float:right' ";
+		const divInputUnchecked = "/>";
+		const divInputChecked = "checked />";
+	
+//###############################################################################################################################################################################################################################################    
+
+	headerDialog = "<h2>Gesundheit von <i>" + tokenName + "</i></h2>";
+	inputDialog = headerDialog;
+	inputDialog += divFlexStart + "Gesundheit:<input id='inputGesundheit'" + divInputNumber  + "0'/>" + divFlexEnd;
+	inputDialog += divFlexStart + "Wille:<input id='inputWille'" + divInputNumber  + "0'/>" + divFlexEnd;
+	inputDialog += divFlexStart + "Stabilität:<input id='inputStabilität'" + divInputNumber  + "0'/>" + divFlexEnd;
+	inputDialog += "<br>"
+	inputDialog += divFlexStart + `
+			<label for="checkPay">Werden die Punkte abgezogen?</label><input type="checkbox" id="checkPay" name="checkPay" style="float:right">
+		`+ divFlexEnd + hr;
+	inputDialog += "<u>Gesundheit:</u><br>"
+	if(Gesundheit === 1){
+		inputDialog += "<b>" + Gesundheit + "</b> Punkt<br><br>";
+	}else{
+		inputDialog += "<b>" + Gesundheit + "</b> Punkte<br><br>";
+	}
+	inputDialog += "<u>Wille:</u><br>"
+	if(Wille === 1){
+		inputDialog += "<b>" + Wille + "</b> Punkt<br><br>";
+	}else{
+		inputDialog += "<b>" + Wille + "</b> Punkte<br><br>";
+	}
+	inputDialog += "<u>Stabilität:</u><br>"
+	if(Wille === 1){
+		inputDialog += "<b>" + Stabilität + "</b> Punkt<br><br>";
+	}else{
+		inputDialog += "<b>" + Stabilität + "</b> Punkte<br><br>";
+	}
+
+//###############################################################################################################################################################################################################################################    
+
+    new Dialog({
+        title: "Gesundheit/Wille/Stabilität",
+        content: inputDialog,
+        buttons: {
+            close: {
+                icon: '<i class="fas fa-times"></i>', label: "Schließen"
+            }, 
+            accept: {
+                icon: '<i class="fas fa-check"></i>', label: "Eintragen", callback: htmlCallback
+            }  
+        },
+        default: "accept",
+        render: () => console.log(),
+        close: () => console.log()
+    }).render(true);
+    
+    async function htmlCallback(html){
+ 
+		const checkPayInput = html.find("#checkPay")[0].checked;
+				Pay = (checkPayInput === true)? -1 : 1;
+		const inputGesundheitValue = Number(html.find("#inputGesundheit")[0]?.value || 0);
+		const inputWilleValue = Number(html.find("#inputWille")[0]?.value || 0);
+		const inputStabilitätValue = Number(html.find("#inputStabilität")[0]?.value || 0);
+		
+
+		if(Pay === -1){
+			newGesundheit = Gesundheit - inputGesundheitValue;
+			newWille = Wille - inputWilleValue;			
+			newStabilität = Stabilität - inputStabilitätValue;
+		}else{
+			newGesundheit = Gesundheit + inputGesundheitValue;
+			newWille = Wille + inputWilleValue;
+			newStabilität = Stabilität + inputStabilitätValue;
+		}
+		
+        flavor = "Gesundheit/Wille/Stabilität<br>";
+		if(Pay === -1){
+			flavor += "<b>" + tokenName + "</b> verliert: <br>";
+		}else{
+			flavor += "<b>" + tokenName + "</b> bekommt: <br>";
+		}
+		if(inputGesundheitValue > 0){
+			if(inputGesundheitValue === 1){
+				flavor += "<b>" + inputGesundheitValue + "</b> Punkt Gesundheit<br>";
+			}else{
+				flavor += "<b>" + inputGesundheitValue + "</b> Punkte Gesundheit<br>";
+			}
+		}
+		if(inputWilleValue > 0){
+			if(inputWilleValue === 1){
+				flavor += "<b>" + inputWilleValue + "</b> Punkt Wille<br>";
+			}else{
+				flavor += "<b>" + inputWilleValue + "</b> Punkte Wille<br>";
+			}
+		}
+		if(inputStabilitätValue > 0){
+			if(inputStabilitätValue === 1){
+				flavor += "<b>" + inputStabilitätValue + "</b> Punkt Stabilität<br>";
+			}else{
+				flavor += "<b>" + inputStabilitätValue + "</b> Punkte Stabilität<br>";
+			}
+		}
+
+		flavor += hr;
+		flavor += "Die aktuellen Werte sind:<br>";
+		if(newGesundheit === 1){
+			flavor += "<b>" + newGesundheit + "</b> Punkt<br>";
+		}else{
+			flavor += "<b>" + newGesundheit + "</b> Punkte<br>";
+		}
+		if(newWille === 1){
+			flavor += "<b>" + newWille + "</b> Punkt<br>";
+		}else{
+			flavor += "<b>" + newWille + "</b> Punkte<br>";
+		}
+		if(newStabilität === 1){
+			flavor += "<b>" + newStabilität + "</b> Punkt<br>";
+		}else{
+			flavor += "<b>" + newStabilität + "</b> Punkte<br>";
+		}
+		
+		ChatMessage.create({
+			flavor: flavor, 
+			user: game.user._id,
+			blind: true,
+			whisper: game.users.filter(u => u.isGM).map(u => u.id)
+		});
+        updating(newGesundheit, newWille, newStabilität)
+	};
+
+    function updating(newGesundheit, newWille, newStabilität){
+       
+		GesundheitUpdate = newGesundheit;
+		WilleUpdate = newWille;
+		StabilitätUpdate = newStabilität;
+		
+		token.actor.update({
+			'system.health.value': newGesundheit,
+			'system.wp.value': newWille,
+			'system.sanity.value': newStabilität,
+		});
+	}
+}
