@@ -1,4 +1,4 @@
-// Skript zum Verwalten von Gesundheit, Wille und Stabilität
+// Skript zum Verwalten von Gesundheit
 
 
 main();
@@ -30,8 +30,11 @@ async function main() {
 
 	//Gesundheit-Rationen
 		const Gesundheit = token.actor.system.health.value;
+		const maxGesundheit = token.actor.system.health.max;
 		const Wille = token.actor.system.wp.value;
+		const maxWille = token.actor.system.wp.max;
 		const Stabilität = token.actor.system.sanity.value;
+		const maxStabilität = token.actor.system.sanity.max;
 		const Belastungsgrenze = token.actor.system.sanity.currentBreakingPoint;
 		const Schutz = token.actor.system.health.protection;
 
@@ -48,7 +51,7 @@ async function main() {
 	
 //###############################################################################################################################################################################################################################################    
 
-	headerDialog = "<h2>Gesundheit von <i>" + tokenName + "</i></h2>";
+	headerDialog = "<h2>Zustand von <i>" + tokenName + "</i></h2>";
 	inputDialog = headerDialog;
 	inputDialog += divFlexStart + "Gesundheit:<input id='inputGesundheit'" + divInputNumber  + "0'/>" + divFlexEnd;
 	inputDialog += divFlexStart + "Wille:<input id='inputWille'" + divInputNumber  + "0'/>" + divFlexEnd;
@@ -128,8 +131,17 @@ async function main() {
 				}
 		}else{
 			newGesundheit = Gesundheit + inputGesundheitValue;
+			if(newGesundheit > maxGesundheit){
+				newGesundheit = maxGesundheit
+				}
 			newWille = Wille + inputWilleValue;
+			if(newWille > maxWille){
+				newWille = maxWille
+				}
 			newStabilität = Stabilität + inputStabilitätValue;
+			if(newStabilität > maxStabilität){
+				newStabilität = maxStabilität
+			}
 		}
 		
         flavor = "Gesundheit/Wille/Stabilität<br>";
