@@ -1,4 +1,4 @@
-// Skript zum Verwalten von Gesundheit
+// Skript zum Verwalten von Gesundheit, Wille und Stabilität
 
 
 main();
@@ -32,7 +32,8 @@ async function main() {
 		const Gesundheit = token.actor.system.health.value;
 		const Wille = token.actor.system.wp.value;
 		const Stabilität = token.actor.system.sanity.value;
-		const Schwelle = token.actor.system.sanity.currentBreakingPoint;
+		const Belastungsgrenze = token.actor.system.sanity.currentBreakingPoint;
+		const Schutz = token.actor.system.health.protection;
 
 //###############################################################################################################################################################################################################################################
 
@@ -54,7 +55,10 @@ async function main() {
 	inputDialog += divFlexStart + "Stabilität:<input id='inputStabilität'" + divInputNumber  + "0'/>" + divFlexEnd;
 	inputDialog += "<br>"
 	inputDialog += divFlexStart + `
-			<label for="checkPay">Werden die Punkte abgezogen?</label><input type="checkbox" id="checkPay" name="checkPay" style="float:right">
+			<label for="checkPay">Werden die Punkte regeneriert?</label><input type="checkbox" id="checkPay" name="checkPay" style="float:right">
+		`+ divFlexEnd;
+	inputDialog += divFlexStart + `
+			<label for="checkProtection">Soll der Rüstungsschutz ignoriert werden?</label><input type="checkbox" id="checkProtection" name="checkProtection" style="float:right">
 		`+ divFlexEnd + hr;
 	inputDialog += "<u>Gesundheit:</u><br>"
 	if(Gesundheit === 1){
@@ -74,10 +78,10 @@ async function main() {
 	}else{
 		inputDialog += "<b>" + Stabilität + "</b> Punkte<br>";
 	}
-	if(Schwelle === 1){
-		inputDialog += "Schwelle: <b>" + Schwelle + "</b> Punkt<br><br>";
+	if(Belastungsgrenze === 1){
+		inputDialog += "Belastungsgrenze: <b>" + Belastungsgrenze + "</b> Punkt<br><br>";
 	}else{
-		inputDialog += "Schwelle: <b>" + Schwelle + "</b> Punkte<br><br>";
+		inputDialog += "Belastungsgrenze: <b>" + Belastungsgrenze + "</b> Punkte<br><br>";
 	}
 
 //###############################################################################################################################################################################################################################################    
@@ -101,16 +105,27 @@ async function main() {
     async function htmlCallback(html){
  
 		const checkPayInput = html.find("#checkPay")[0].checked;
-				Pay = (checkPayInput === true)? -1 : 1;
+				Pay = (checkPayInput === false)? -1 : 1;
+		const checkProtectionInput = html.find("#checkProtection")[0].checked;
+				Protection = (checkProtectionInput === true)? 0 : Schutz;
 		const inputGesundheitValue = Number(html.find("#inputGesundheit")[0]?.value || 0);
 		const inputWilleValue = Number(html.find("#inputWille")[0]?.value || 0);
 		const inputStabilitätValue = Number(html.find("#inputStabilität")[0]?.value || 0);
 		
 
 		if(Pay === -1){
-			newGesundheit = Gesundheit - inputGesundheitValue;
+			newGesundheit = Gesundheit - (inputGesundheitValue - Protection);
+			if(newGesundheit < 0){
+				newGesundheit = 0
+				}
 			newWille = Wille - inputWilleValue;			
+			if(newWille < 0){
+				newWille = 0
+				}
 			newStabilität = Stabilität - inputStabilitätValue;
+			if(newStabilität < 0){
+				newStabilität = 0
+				}
 		}else{
 			newGesundheit = Gesundheit + inputGesundheitValue;
 			newWille = Wille + inputWilleValue;
@@ -125,24 +140,49 @@ async function main() {
 		}
 		if(inputGesundheitValue > 0){
 			if(inputGesundheitValue === 1){
-				flavor += "<b>" + inputGesundheitValue + "</b> Punkt Gesundheit<br>";
+				flavor += "<b>" + inputGesundheitValue + "</b> Punkt Gesundheit";
 			}else{
-				flavor += "<b>" + inputGesundheitValue + "</b> Punkte Gesundheit<br>";
+				flavor += "<b>" + inputGesundheitValue + "</b> Punkte Gesundheit";
 			}
+		if(newGesundheit === 2 || newGesundheit === 1){
+				flavor += ", ist ohnmächtig und muss eine Probe auf KON x5 ablegen um keine dauerhafte Verletzung davonzutragen."
+		}
+		if (newGesundheit === 0 || newGesundheit < 0){
+				flavor += " und ist <b>tod</b>."
+		}
+		flavor += "<br>";
 		}
 		if(inputWilleValue > 0){
 			if(inputWilleValue === 1){
-				flavor += "<b>" + inputWilleValue + "</b> Punkt Wille<br>";
+				flavor += "<b>" + inputWilleValue + "</b> Punkt Wille";
 			}else{
-				flavor += "<b>" + inputWilleValue + "</b> Punkte Wille<br>";
+				flavor += "<b>" + inputWilleValue + "</b> Punkte Wille";
 			}
+		if(newWille === 2 || newWille === 1){
+				flavor += ", erleidet einen emotionalen Zusammenbruch und erhält -20% auf alle Proben."
+		}
+		if (newWille === 0 || newWille < 0){
+				flavor += ", bricht schluchzend zusammen, schlägt wild um sich oder wird ohnmächtig."
+		}
+		flavor += "<br>";
 		}
 		if(inputStabilitätValue > 0){
 			if(inputStabilitätValue === 1){
-				flavor += "<b>" + inputStabilitätValue + "</b> Punkt Stabilität<br>";
+				flavor += "<b>" + inputStabilitätValue + "</b> Punkt Stabilität";
 			}else{
-				flavor += "<b>" + inputStabilitätValue + "</b> Punkte Stabilität<br>";
+				flavor += "<b>" + inputStabilitätValue + "</b> Punkte Stabilität";
 			}
+		if((newStabilität === (Stabilität - 5) || newStabilität < (Stabilität - 5)) && (Pay === -1) && (newStabilität > 0)){
+				flavor += " und erleidet eine <b>verübergehende Geistesstörung</b> (Fliehen, Aufgeben oder Kämpfen)"
+		}
+		if(newStabilität === 0){
+				flavor += " und wird <b>permanent wahnsinning</b>."
+		}
+		if((newStabilität === Belastungsgrenze || newStabilität < Belastungsgrenze) && newStabilität > 0){
+				flavor += " und erhält ein <b>Syndrom</b>.<br>"
+				flavor += "<br><b>Die Belastungsgrenze muss neu berechnet werden!</b>"
+		}
+		flavor += "<br>";	
 		}
 
 		flavor += hr;
@@ -158,9 +198,9 @@ async function main() {
 			flavor += "Wille: <b>" + newWille + "</b> Punkte<br>";
 		}
 		if(newStabilität === 1){
-			flavor += "Stabilität: <b>" + newStabilität + "</b> Punkt, Schwelle: <b>" + Schwelle + "</b> Punkte<br>";
+			flavor += "Stabilität: <b>" + newStabilität + "</b> Punkt, Belastungsgrenze: <b>" + Belastungsgrenze + "</b> Punkte<br>";
 		}else{
-			flavor += "Stabilität: <b>" + newStabilität + "</b> Punkte, Schwelle: <b>" + Schwelle + "</b> Punkte<br>";
+			flavor += "Stabilität: <b>" + newStabilität + "</b> Punkte, Belastungsgrenze: <b>" + Belastungsgrenze + "</b> Punkte<br>";
 		}
 		
 		ChatMessage.create({
